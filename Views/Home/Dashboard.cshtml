@@ -24,11 +24,13 @@
             <tbody>
                 @foreach(Wedding wed in @Model) {
                     @:<tr>
-                        @:<td>
+                        @:<td><a href="/guestlist/
+                        @wed.WeddingId
+                        @:">
                             @wed.Wedder1 
                             @:&amp; 
                             @wed.Wedder2
-                        @:</td><td>
+                        @:</a></td><td>
                             @wed.Date
                         @:</td><td>
                             @wed.WeddingGuests.Count()
@@ -38,7 +40,7 @@
                                 @wed.WeddingId;
                                 @:">Delete</a>
                             } 
-                            else if(@wed.WeddingGuests.Any(wg=>wg.User.UserId == @userId && wg.State == "RSVP")) {
+                            else if(@wed.WeddingGuests.Any(wg=>wg.User.UserId == (int)@userId)) {
                                 @:<a href="/rsvp/
                                 @wed.WeddingId;
                                 @:">Un-RSVP</a>

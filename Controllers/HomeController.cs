@@ -90,36 +90,57 @@ namespace Wedding_Planner.Controllers
             return View("Index");
         }
 
+        // To access the functionality below, you must be logged in.
         [Route("/dashboard")]
         [ServiceFilter(typeof(LoggedInAttribute))]
         public IActionResult Dashboard()
         {
-                ViewData["Message"] = "Your success page.";
-                ViewData["User"] = HttpContext.Session.GetInt32("User");
-                List<Wedding> wed = _dbContext.Weddings
-                    .Include(wg=>wg.Creator)
-                    .Include(wg => wg.WeddingGuests)
-                    .ThenInclude(g=>g.User)
-                    .ToList();
+            ViewData["Message"] = "Your success page.";
+            ViewData["User"] = HttpContext.Session.GetInt32("User");
+            List<Wedding> wed = _dbContext.Weddings
+                .Include(wg=>wg.Creator)
+                .Include(wg => wg.WeddingGuests)
+                .ThenInclude(g=>g.User)
+                .ToList();
 
-                return View(wed);
+            return View(wed);
         }
 
         [HttpGet]
         [Route("/logout")]
+        [ServiceFilter(typeof(LoggedInAttribute))]
         public IActionResult Logout(){
-                HttpContext.Session.SetString("User", null);
-                return Redirect("/login");
+            HttpContext.Session.Remove("User");
+            return Redirect("/login");
+        }
+
+        [HttpGet]
+        [Route("/delete/{weddingid}")]
+        [ServiceFilter(typeof(LoggedInAttribute))]
+        public IActionResult Create(int weddingid){
+            int userid = (int)HttpContext.Session.GetInt32("User");
+            Wedding wedding = _dbContext.Weddings
+                .Include(c=>c.Creator)
+                .Where(w=>w.WeddingId == weddingid).FirstOrDefault();
+
+            if(wedding.Creator.UserId == userid) {
+                _dbContext.Remove(wedding);
+                _dbContext.SaveChanges();
+            }
+            
+            return Redirect("/dashboard");
         }
 
         [HttpGet]
         [Route("/create")]
+        [ServiceFilter(typeof(LoggedInAttribute))]
         public IActionResult Create(){
             return View();
         }
 
         [HttpPost]
         [Route("/create")]
+        [ServiceFilter(typeof(LoggedInAttribute))]
         public IActionResult Create(Wedding model){
             if(!ModelState.IsValid) 
                 return View();
@@ -131,6 +152,53 @@ namespace Wedding_Planner.Controllers
 
             return Redirect("/dashboard");
         }
+
+        [HttpGet]
+        [Route("/rsvp/{weddingid}")]
+        [ServiceFilter(typeof(LoggedInAttribute))]
+        public IActionResult Rsvp(int weddingid){
+            int userid = (int)HttpContext.Session.GetInt32("User");
+            User user = _dbContext.Users.Where(u=>u.UserId == userid).First();
+            Wedding wedding = _dbContext.Weddings
+                .Include(w=>w.Creator).Where(w=>w.WeddingId== weddingid && w.CreatorId != userid).First();
+
+            bool userWedding = _dbContext.UserWedding_Xrf.Any(uw=>uw.UserId == userid && uw.WeddingId == weddingid);
+            
+            if(userWedding == true) {
+                UserWedding_Xrf newUserWedding = _dbContext.UserWedding_Xrf
+                    .Where(uw=>uw.UserId == userid && uw.WeddingId == weddingid)
+                    .First();
+                
+                _dbContext.UserWedding_Xrf.Remove(newUserWedding);
+            } else if(userWedding == false){
+                UserWedding_Xrf newUserWedding = new UserWedding_Xrf();
+                newUserWedding.UserId = userid;
+                newUserWedding.WeddingId = weddingid;
+                newUserWedding.State = "RSPV";
+                UserWedding_Xrf addedUserWedding = _dbContext.Add(newUserWedding).Entity;
+                user.WeddingGuests.Add(addedUserWedding);
+                wedding.WeddingGuests.Add(addedUserWedding);
+            }
+
+            _dbContext.SaveChanges();
+
+            return Redirect("/dashboard");
+        }
+
+        [HttpGet]
+        [Route("/guestlist/{weddingid}")]
+        public IActionResult GuestList(int weddingid) {
+            Wedding wedding = _dbContext.Weddings
+            .Include(w=>w.Creator)
+            .Include(w=>w.WeddingGuests)
+            .ThenInclude(wg=>wg.User)
+            .Where(w=>w.WeddingId == weddingid)
+            .FirstOrDefault();
+
+            ViewData["Heading"] = wedding.Wedder1 + " & " + wedding.Wedder2 + "'s Wedding";
+            return View(wedding);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

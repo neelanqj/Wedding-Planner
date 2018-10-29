@@ -31,3 +31,4 @@ C:\Storage\C\Wedding-Planner\obj\Debug\netcoreapp2.1\Wedding-Planner.Views.pdb
 C:\Storage\C\Wedding-Planner\obj\Debug\netcoreapp2.1\Wedding-Planner.csproj.CopyComplete
 C:\Storage\C\Wedding-Planner\obj\Debug\netcoreapp2.1\Razor\Views\Home\Create.g.cshtml.cs
 C:\Storage\C\Wedding-Planner\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_Navigation.g.cshtml.cs
+C:\Storage\C\Wedding-Planner\obj\Debug\netcoreapp2.1\Razor\Views\Home\GuestList.g.cshtml.cs
