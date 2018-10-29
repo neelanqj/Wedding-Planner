@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row">
+    <div class="col-md-10">
+        <h1>Welcome To The Wedding Planner</h1>
+    </div>
+    <div class="col-md-2">
+        <a href="/logout">Log Out</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-stripped">
+            <thead>
+                <th>Wedding</th>
+                <th>Date</th>
+                <th>Guest</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                @foreach(Wedding wed in @Model) {
+                    @:<tr>
+                        @:<td>
+                            @wed.Wedder1 
+                            @:&amp; 
+                            @wed.Wedder2
+                        @:</td><td>
+                            @wed.Date
+                        @:</td><td>
+                            @wed.WeddingGuests.Count()
+                        @:</td><td>
+                            @:Action
+                        @:</td>
+                    @:</tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10"></div>
+    <div class="col-md-2">
+        <a class="btn btn-default" href="/create">
+            New Wedding
+        </a>
+    </div>
+</div>

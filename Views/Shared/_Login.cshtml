@@ -1,0 +1,12 @@
+<h1>Login</h1>
+@Html.ValidationSummary()
+<br/>
+@model LoginUser
+<form action="/login" method="POST">
+    <label asp-for="Email"></label><br/>
+    <input asp-for="Email"/><br/><br/>
+    <label asp-for="Password"></label><br/>
+    <input asp-for="Password"/><br/><br/>
+    <input type="submit" value="Login Now" />                
+</form>
+      
