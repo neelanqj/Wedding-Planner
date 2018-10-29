@@ -95,7 +95,9 @@ namespace Wedding_Planner.Controllers
         public IActionResult Dashboard()
         {
                 ViewData["Message"] = "Your success page.";
+                ViewData["User"] = HttpContext.Session.GetInt32("User");
                 List<Wedding> wed = _dbContext.Weddings
+                    .Include(wg=>wg.Creator)
                     .Include(wg => wg.WeddingGuests)
                     .ThenInclude(g=>g.User)
                     .ToList();
@@ -104,6 +106,7 @@ namespace Wedding_Planner.Controllers
         }
 
         [HttpGet]
+        [Route("/logout")]
         public IActionResult Logout(){
                 HttpContext.Session.SetString("User", null);
                 return Redirect("/login");
@@ -120,6 +123,8 @@ namespace Wedding_Planner.Controllers
         public IActionResult Create(Wedding model){
             if(!ModelState.IsValid) 
                 return View();
+
+            model.CreatorId = (int)HttpContext.Session.GetInt32("User");
 
             _dbContext.Add(model);
             _dbContext.SaveChanges();

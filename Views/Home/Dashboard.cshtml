@@ -1,5 +1,6 @@
 @{
     ViewData["Title"] = "Dashboard";
+    var userId = (int)ViewData["User"];
 }
 
 <div class="row">
@@ -32,13 +33,12 @@
                         @:</td><td>
                             @wed.WeddingGuests.Count()
                         @:</td><td>
-                            @var userId = @HttpContextAccessor.HttpContext.Session.GetInt32("User");
-                            @if(wed.WeddingGuests.Any(wg=>wg.Creator.UserId == userId)) {
+                            @if(@wed.Creator.UserId == @userId) {
                                 @:<a href="/delete/
                                 @wed.WeddingId;
                                 @:">Delete</a>
                             } 
-                            else if(@wed.WeddingGuests.Any(wg.User.UserId == userId && wg.State == "RSVP")) {
+                            else if(@wed.WeddingGuests.Any(wg=>wg.User.UserId == @userId && wg.State == "RSVP")) {
                                 @:<a href="/rsvp/
                                 @wed.WeddingId;
                                 @:">Un-RSVP</a>
@@ -48,6 +48,7 @@
                                 @wed.WeddingId;
                                 @:">RSVP</a>
                             }
+                            
                         @:</td>
                     @:</tr>
                 }
